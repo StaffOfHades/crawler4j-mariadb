@@ -1,0 +1,38 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+group = 'com.github.staffofhades'
+version = '0.1.0'
+
+description = """crawler4j-mariadb"""
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven {
+        url "http://repo.maven.apache.org/maven2"
+        url "https://repo.boundlessgeo.com/main/"
+    }
+}
+dependencies {
+    compile group: "org.mariadb.jdbc", name:"mariadb-java-client", version: "2.1.2"
+    compile group: 'com.mchange', name: 'c3p0', version:'0.9.5.2'
+    compile(group: 'edu.uci.ics', name: 'crawler4j', version:'4.3') {
+        exclude(module: 'slf4j-api')
+        exclude(module: 'logback-classic')
+    }
+    compile group: 'org.slf4j', name: 'slf4j-api', version:'1.7.22'
+
+    runtime group: 'org.slf4j', name: 'slf4j-log4j12', version:'1.7.22'
+    runtime group: 'log4j', name: 'log4j', version:'1.2.16'
+}
+
+task wrapper(type: Wrapper) {
+  gradleVersion="4.2.1"
+}

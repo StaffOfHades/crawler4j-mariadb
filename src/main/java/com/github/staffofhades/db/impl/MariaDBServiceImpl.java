@@ -1,33 +1,39 @@
-package com.github.rzo1.db.impl;
+package com.github.staffofhades.db.impl;
 
-import com.github.rzo1.db.PostgresDBService;
+import com.github.staffofhades.db.DBService;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
+
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyVetoException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Date;
 
-public class PostgresDBServiceImpl implements PostgresDBService {
+public class MariaDBServiceImpl implements DBService {
 
-    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(PostgresDBServiceImpl.class);
+    private static final Logger logger =
+        LoggerFactory.getLogger(MariaDBServiceImpl.class);
 
     private ComboPooledDataSource comboPooledDataSource;
 
     private PreparedStatement insertKeyStatement;
 
-    public PostgresDBServiceImpl(String dbUrl, String dbUser, String dbPw, String driver) throws
-            PropertyVetoException, SQLException {
-        comboPooledDataSource = new ComboPooledDataSource();
-        comboPooledDataSource.setDriverClass(driver);
-        comboPooledDataSource.setJdbcUrl(dbUrl);
-        comboPooledDataSource.setUser(dbUser);
-        comboPooledDataSource.setPassword(dbPw);
+    public MariaDBServiceImpl(  String dbUrl, String dbUser,
+                                String dbPw, String driver )
+        throws PropertyVetoException, SQLException {
 
-        createDatabase();
+        comboPooledDataSource = new ComboPooledDataSource();
+        comboPooledDataSource.setDriverClass( driver );
+        comboPooledDataSource.setJdbcUrl( dbUrl );
+        comboPooledDataSource.setUser( dbUser );
+        comboPooledDataSource.setPassword( dbPw );
+
+        //createDatabase();
     }
 
     private void createDatabase() throws SQLException {
@@ -58,29 +64,33 @@ public class PostgresDBServiceImpl implements PostgresDBService {
     }
 
     @Override
-    public void store(Page page) {
+    public void store( Page page ) {
 
-        if (page.getParseData() instanceof HtmlParseData) {
+        if( page.getParseData() instanceof HtmlParseData ) {
             try {
 
                 HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
 
-                insertKeyStatement.setString(1, htmlParseData.getHtml());
-                insertKeyStatement.setString(2, htmlParseData.getText());
-                insertKeyStatement.setString(3, page.getWebURL().getURL());
-                insertKeyStatement.setTimestamp(4, new Timestamp(new java.util.Date().getTime()));
+                insertKeyStatement.setString( 1, htmlParseData.getHtml() );
+                insertKeyStatement.setString( 2, htmlParseData.getText() );
+                insertKeyStatement.setString( 3, page.getWebURL().getURL() );
+                insertKeyStatement.setTimestamp( 4, new Timestamp(new Date().getTime() ) );
                 insertKeyStatement.executeUpdate();
             } catch (SQLException e) {
-                logger.error("SQL Exception while storing webpage for url'{}'", page.getWebURL().getURL(), e);
-                throw new RuntimeException(e);
+
+                logger.error(
+                    "SQL Exception while storing webpage for url'{}'",
+                    page.getWebURL().getURL(),
+                    e
+                );
+                throw new RuntimeException( e );
             }
         }
     }
 
     @Override
     public void close() {
-        if (comboPooledDataSource != null) {
+        if( comboPooledDataSource != null )
             comboPooledDataSource.close();
-        }
     }
 }

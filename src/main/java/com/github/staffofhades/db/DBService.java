@@ -1,10 +1,9 @@
-package com.github.rzo1.db;
+package com.github.staffofhades.db;
 
 import edu.uci.ics.crawler4j.crawler.Page;
 
-public interface PostgresDBService {
+public interface DBService {
 
     void store(Page webPage);
-
     void close();
 }
